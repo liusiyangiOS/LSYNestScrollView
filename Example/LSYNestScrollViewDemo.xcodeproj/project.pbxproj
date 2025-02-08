@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6FF84120CEE00021E76CD4F3 /* Pods_LSYNestScrollViewDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE5CD1A511139DC6D3261FD8 /* Pods_LSYNestScrollViewDemo.framework */; };
+		8D07E60B2D56F966009B9553 /* UIScrollView+LSYNest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D07E6092D56F966009B9553 /* UIScrollView+LSYNest.m */; };
 		8D28C4762D54D48500BAF2E7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8D28C4662D54D48500BAF2E7 /* Assets.xcassets */; };
 		8D28C4782D54D48500BAF2E7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8D28C4692D54D48500BAF2E7 /* LaunchScreen.storyboard */; };
 		8D28C47A2D54D48500BAF2E7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D28C4652D54D48500BAF2E7 /* AppDelegate.m */; };
@@ -19,7 +20,6 @@
 		8D3DF18A2D560F7E00894B30 /* CommonTabView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D3DF1892D560F7E00894B30 /* CommonTabView.m */; };
 		8D3DF18F2D5633F800894B30 /* Page1View.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D3DF18E2D5633F800894B30 /* Page1View.m */; };
 		8D3DF1922D56340600894B30 /* Page2View.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D3DF1912D56340600894B30 /* Page2View.m */; };
-		8D3DF1962D56382C00894B30 /* UIScrollView+LSYNest.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D3DF1952D56382C00894B30 /* UIScrollView+LSYNest.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +41,8 @@
 
 /* Begin PBXFileReference section */
 		76E142D90EB0904C6023A1E3 /* Pods-LSYNestScrollViewDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LSYNestScrollViewDemo.release.xcconfig"; path = "Target Support Files/Pods-LSYNestScrollViewDemo/Pods-LSYNestScrollViewDemo.release.xcconfig"; sourceTree = "<group>"; };
+		8D07E6082D56F966009B9553 /* UIScrollView+LSYNest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIScrollView+LSYNest.h"; sourceTree = "<group>"; };
+		8D07E6092D56F966009B9553 /* UIScrollView+LSYNest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+LSYNest.m"; sourceTree = "<group>"; };
 		8D28C40A2D54D13200BAF2E7 /* LSYNestScrollViewDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LSYNestScrollViewDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D28C4252D54D13300BAF2E7 /* LSYNestScrollViewDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LSYNestScrollViewDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D28C42F2D54D13300BAF2E7 /* LSYNestScrollViewDemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LSYNestScrollViewDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -64,8 +66,6 @@
 		8D3DF18E2D5633F800894B30 /* Page1View.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Page1View.m; sourceTree = "<group>"; };
 		8D3DF1902D56340600894B30 /* Page2View.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Page2View.h; sourceTree = "<group>"; };
 		8D3DF1912D56340600894B30 /* Page2View.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Page2View.m; sourceTree = "<group>"; };
-		8D3DF1942D56382C00894B30 /* UIScrollView+LSYNest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIScrollView+LSYNest.h"; sourceTree = "<group>"; };
-		8D3DF1952D56382C00894B30 /* UIScrollView+LSYNest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+LSYNest.m"; sourceTree = "<group>"; };
 		EAFD9DEEA4402A4C00166ABC /* Pods-LSYNestScrollViewDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LSYNestScrollViewDemo.debug.xcconfig"; path = "Target Support Files/Pods-LSYNestScrollViewDemo/Pods-LSYNestScrollViewDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		EE5CD1A511139DC6D3261FD8 /* Pods_LSYNestScrollViewDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LSYNestScrollViewDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -112,6 +112,16 @@
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
+		};
+		8D07E60A2D56F966009B9553 /* LSYNestScrollView */ = {
+			isa = PBXGroup;
+			children = (
+				8D07E6082D56F966009B9553 /* UIScrollView+LSYNest.h */,
+				8D07E6092D56F966009B9553 /* UIScrollView+LSYNest.m */,
+			);
+			name = LSYNestScrollView;
+			path = ../LSYNestScrollView;
+			sourceTree = SOURCE_ROOT;
 		};
 		8D28C4012D54D13200BAF2E7 = {
 			isa = PBXGroup;
@@ -160,7 +170,7 @@
 				8D28C46A2D54D48500BAF2E7 /* main.m */,
 				8D28C4732D54D48500BAF2E7 /* ViewController.h */,
 				8D28C4742D54D48500BAF2E7 /* ViewController.m */,
-				8D3DF1932D56380700894B30 /* LSYNestScrollView */,
+				8D07E60A2D56F966009B9553 /* LSYNestScrollView */,
 				8D3DF17F2D55E5E200894B30 /* Main */,
 			);
 			path = LSYNestScrollViewDemo;
@@ -199,15 +209,6 @@
 				8D3DF1912D56340600894B30 /* Page2View.m */,
 			);
 			path = Page2;
-			sourceTree = "<group>";
-		};
-		8D3DF1932D56380700894B30 /* LSYNestScrollView */ = {
-			isa = PBXGroup;
-			children = (
-				8D3DF1942D56382C00894B30 /* UIScrollView+LSYNest.h */,
-				8D3DF1952D56382C00894B30 /* UIScrollView+LSYNest.m */,
-			);
-			path = LSYNestScrollView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -391,7 +392,7 @@
 				8D3DF1922D56340600894B30 /* Page2View.m in Sources */,
 				8D3DF18A2D560F7E00894B30 /* CommonTabView.m in Sources */,
 				8D3DF1872D55F01300894B30 /* MainContentView.m in Sources */,
-				8D3DF1962D56382C00894B30 /* UIScrollView+LSYNest.m in Sources */,
+				8D07E60B2D56F966009B9553 /* UIScrollView+LSYNest.m in Sources */,
 				8D3DF18F2D5633F800894B30 /* Page1View.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
