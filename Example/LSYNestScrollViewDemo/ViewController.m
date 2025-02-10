@@ -6,7 +6,7 @@
 //
 
 #import "ViewController.h"
-#import "MainViewController.h"
+#import "NormalViewController.h"
 #import <Masonry/Masonry.h>
 
 @interface ViewController ()
@@ -18,18 +18,35 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.whiteColor;
+    
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    [button setTitle:@"跳转" forState:UIControlStateNormal];
-    [button setTitleColor:UIColor.blackColor forState:UIControlStateNormal];
-    [button addTarget:self action:@selector(jumpButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [button setTitle:@"一般使用方式" forState:UIControlStateNormal];
+    [button setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(normalButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:button];
     [button mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.center.equalTo(self.view);
+        make.centerX.equalTo(self.view);
+        make.centerY.equalTo(self.view).offset(-50);
+    }];
+    
+    UIButton *button1 = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button1 setTitle:@"复杂使用方式" forState:UIControlStateNormal];
+    [button1 setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
+    [button1 addTarget:self action:@selector(complexButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:button1];
+    [button1 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.view);
+        make.centerY.equalTo(self.view).offset(50);
     }];
 }
 
-- (void)jumpButtonClicked:(UIButton *)sender {
-    MainViewController *mainVC = [[MainViewController alloc] init];
+- (void)normalButtonClicked:(UIButton *)sender {
+    NormalViewController *mainVC = [[NormalViewController alloc] init];
+    [self.navigationController pushViewController:mainVC animated:YES];
+}
+
+- (void)complexButtonClicked:(UIButton *)sender {
+    NormalViewController *mainVC = [[NormalViewController alloc] init];
     [self.navigationController pushViewController:mainVC animated:YES];
 }
 

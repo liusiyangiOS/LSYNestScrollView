@@ -5,7 +5,7 @@
 //  Created by liusiyang on 2025/2/7.
 //
 
-#import "MainContentView.h"
+#import "NormalContentView.h"
 #import "CommonTabView.h"
 #import <Masonry/Masonry.h>
 #import "Page1View.h"
@@ -14,13 +14,13 @@
 
 #define kPageViewTagOrigin 'page'
 
-@interface MainContentView ()<UIScrollViewDelegate>{
+@interface NormalContentView ()<UIScrollViewDelegate>{
     CommonTabView *_tabView;
 }
 
 @end
 
-@implementation MainContentView
+@implementation NormalContentView
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -59,15 +59,17 @@
             UIView *pageView = [[NSClassFromString(pageClassArray[i]) alloc] init];
             [scrollView addSubview:pageView];
             [pageView mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.top.bottom.equalTo(scrollView);
+                make.top.equalTo(scrollView);
                 make.leading.mas_equalTo(i * UIScreen.mainScreen.bounds.size.width);
                 make.width.mas_equalTo(UIScreen.mainScreen.bounds.size.width);
+                make.height.equalTo(scrollView);
             }];
         }
         
         _tabView.selectedChangedAction = ^(NSInteger index) {
             [scrollView setContentOffset:CGPointMake(index * UIScreen.mainScreen.bounds.size.width, 0) animated:YES];
-            
+            //第三步,切换的时候,更新active的ScrollView
+            [UIScrollView lsyNest_setActiveIndex:index forKey:@"Example"];
         };
     }
     return self;
@@ -77,6 +79,8 @@
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
     _tabView.index = scrollView.contentOffset.x / UIScreen.mainScreen.bounds.size.width;
+    //第三步,切换的时候,更新active的ScrollView
+    [UIScrollView lsyNest_setActiveIndex:_tabView.index forKey:@"Example"];
 }
 
 @end

@@ -1,5 +1,5 @@
 //
-//  MainContentView.h
+//  Page2View.h
 //  LSYNestScrollViewDemo
 //
 //  Created by liusiyang on 2025/2/7.
@@ -9,7 +9,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MainContentView : UIView
+@interface Page2View : UIView
+
+- (instancetype)initWithIndex:(NSInteger)index;
 
 @end
 

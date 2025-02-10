@@ -39,6 +39,13 @@
 
 @property (nonatomic, assign) BOOL shouldScroll;
 
+/**
+ 滑动手势是否与其他的ScrollView的滑动手势同时识别
+ 默认NO,innnerScrollView会在注册的时候设置为YES
+ 除innnerScrollView之外的,使用者可根据自己的需要进行设置
+ */
+@property (nonatomic, assign) BOOL recognizeSimultaneouslyForPan;
+
 @end
 
 @implementation LSYScrollViewNestParam
@@ -54,7 +61,7 @@
     param.isMainScrollView = YES;
     if (structure.innerScrollViews.count) {
         //默认第一个注册的inner与main联动
-        [structure.mainScrollView lsyNest_param].activeScrollView = self;
+//        [structure.mainScrollView lsyNest_param].activeScrollView = self;
     }
 }
 
@@ -74,6 +81,7 @@
     [structure.innerScrollViews setObject:self forKey:@(index)];
     LSYScrollViewNestParam *param = [self lsyNest_param];
     param.mainScrollView = structure.mainScrollView;
+    param.recognizeSimultaneouslyForPan = YES;
 }
 
 - (void)lsyNest_setActive{
@@ -113,12 +121,12 @@
     return param;
 }
 
-//- (void)setLsyNest_shouldScroll:(BOOL)lsyNest_shouldScroll{
-//    
-//}
-//
-//-(BOOL)lsyNest_shouldScroll{
-//    
-//}
+-(void)setLsyNest_recognizeSimultaneouslyForPan:(BOOL)lsyNest_recognizeSimultaneouslyForPan{
+    [self lsyNest_param].recognizeSimultaneouslyForPan = lsyNest_recognizeSimultaneouslyForPan;
+}
+
+-(BOOL)lsyNest_recognizeSimultaneouslyForPan{
+    return [self lsyNest_param].recognizeSimultaneouslyForPan;
+}
 
 @end

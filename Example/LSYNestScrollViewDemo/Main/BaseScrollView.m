@@ -6,6 +6,7 @@
 //
 
 #import "BaseScrollView.h"
+#import "UIScrollView+LSYNest.h"
 
 @implementation BaseScrollView
 

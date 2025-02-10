@@ -11,7 +11,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIScrollView (LSYNest)
 
-//@property (nonatomic, assign) BOOL lsyNest_shouldScroll;
+/**
+ 滑动手势是否与其他的ScrollView的滑动手势同时识别
+ 默认NO,innnerScrollView会在注册的时候设置为YES,这个属性没特殊需要不用管
+ 除innnerScrollView之外的,使用者可根据自己的需要进行设置
+ */
+@property (nonatomic, assign) BOOL lsyNest_recognizeSimultaneouslyForPan;
 
 /**
  将ScrollView注册为嵌套模式的主ScrollView(最外层的)

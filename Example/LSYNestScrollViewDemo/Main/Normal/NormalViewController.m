@@ -5,10 +5,11 @@
 //  Created by liusiyang on 2025/2/6.
 //
 
-#import "MainViewController.h"
+#import "NormalViewController.h"
 #import <Masonry/Masonry.h>
 #import "BaseScrollView.h"
-#import "MainContentView.h"
+#import "NormalContentView.h"
+#import "UIScrollView+LSYNest.h"
 
 #define STATUSBAR_HEIGHT \
 ({ CGFloat topHeight = 20.0f;\
@@ -18,13 +19,13 @@ topHeight = window.safeAreaInsets.top;\
 }\
 (topHeight);})
 
-@interface MainViewController ()<UIScrollViewDelegate>{
+@interface NormalViewController ()<UIScrollViewDelegate>{
     UIScrollView *_scrollView;
 }
 
 @end
 
-@implementation MainViewController
+@implementation NormalViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -32,7 +33,10 @@ topHeight = window.safeAreaInsets.top;\
     
     _scrollView = [[BaseScrollView alloc] initWithFrame:self.view.bounds];
     _scrollView.directionalLockEnabled = YES;
-    _scrollView.delegate = self;
+    //第一步,设置mainScrollView
+    [_scrollView lsyNest_registerAsMainWithDelegate:self forKey:@"Example"];
+    //注册的时候传入代理了,所以就不需要再次设置了
+//    _scrollView.delegate = self;
     _scrollView.showsVerticalScrollIndicator = NO;
     _scrollView.backgroundColor = [UIColor clearColor];
     _scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
@@ -50,7 +54,7 @@ topHeight = window.safeAreaInsets.top;\
         make.height.equalTo(imageView.mas_width).multipliedBy(imageHeight);
     }];
     
-    MainContentView *mainV = [[MainContentView alloc] init];
+    NormalContentView *mainV = [[NormalContentView alloc] init];
     [_scrollView addSubview:mainV];
     [mainV mas_makeConstraints:^(MASConstraintMaker *make) {
         make.leading.width.bottom.equalTo(_scrollView);
