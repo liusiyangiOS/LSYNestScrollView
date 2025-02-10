@@ -68,19 +68,7 @@ static NSString * const kNormalNestKey = @"NormalExample";
 #pragma mark - UIScrollViewDelegate
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-//    CGFloat targetOffsetY = self.targetOffsetY;
-//    if (self.listView.shouldScroll){
-//        scrollView.contentOffset = CGPointMake(0, targetOffsetY);
-//        self.headerView.isStopSliding = YES;
-//    }else if (scrollView.contentOffset.y >= targetOffsetY) {
-//        scrollView.contentOffset = CGPointMake(0, targetOffsetY);
-//        self.headerView.isStopSliding = YES;
-//        if (self.listView.collectionView.dragging) {
-//            self.listView.shouldScroll = YES;
-//        }
-//    }else {
-//        self.headerView.isStopSliding = NO;
-//    }
+    [scrollView lsyNest_didScroll];
 }
 
 @end

@@ -13,13 +13,14 @@
 @property (nonatomic, weak) UIScrollView *mainScrollView;
 
 @property (nonatomic, strong, readonly) NSMapTable *innerScrollViews;
+/** 当前联动的ScrollView */
+@property (nonatomic, weak) UIScrollView *activeScrollView;
 
 @end
 
 @implementation LSYScrollViewNestStructure
 
-- (instancetype)init
-{
+- (instancetype)init{
     self = [super init];
     if (self) {
         _innerScrollViews = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory];
@@ -32,10 +33,6 @@
 @interface LSYScrollViewNestParam : NSObject
 
 @property (nonatomic, assign) BOOL isMainScrollView;
-/** 联动的ScrollView,只有mainScrollView才有值 */
-@property (nonatomic, weak) UIScrollView *activeScrollView;
-/** 主ScrollView,只有innerScrollView才有值 */
-@property (nonatomic, weak) UIScrollView *mainScrollView;
 
 @property (nonatomic, assign) BOOL shouldScroll;
 
@@ -45,7 +42,6 @@
  除innnerScrollView之外的,使用者可根据自己的需要进行设置
  */
 @property (nonatomic, assign) BOOL recognizeSimultaneouslyForPan;
-
 @end
 
 @implementation LSYScrollViewNestParam
@@ -97,6 +93,28 @@
 
 + (void)lsyNest_removeStructureForKey:(NSString *)key{
     [[self lsyNest_structureMap] removeObjectForKey:key];
+}
+
+#pragma mark - 临时方法
+
+-(void)lsyNest_didScroll{
+    LSYScrollViewNestParam *currentParam = [self lsyNest_param];
+    if (currentParam.isMainScrollView) {
+        LSYScrollViewNestParam *activeParam = [currentParam.activeScrollView lsyNest_param];
+        if (activeParam.shouldScroll) {
+//            scrollView.contentOffset = CGPointMake(0, targetOffsetY);
+            self.contentOffset = CGPointMake(0, targetOffsetY);
+        }
+        return;
+    }
+    //    CGFloat targetOffsetY = self.targetOffsetY;
+    //    if (self.listView.shouldScroll){
+    //        scrollView.contentOffset = CGPointMake(0, targetOffsetY);
+    //    }else if (scrollView.contentOffset.y >= targetOffsetY) {
+    //        scrollView.contentOffset = CGPointMake(0, targetOffsetY);
+    //        self.headerView.isStopSliding = YES;
+    //    }else {
+    //    }
 }
 
 #pragma mark - private method

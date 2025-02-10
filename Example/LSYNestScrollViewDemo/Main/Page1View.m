@@ -62,6 +62,7 @@
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
     NSLog(@"------重写不受影响");
+    [scrollView lsyNest_didScroll];
 }
 
 @end

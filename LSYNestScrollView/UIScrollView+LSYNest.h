@@ -53,6 +53,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)lsyNest_removeStructureForKey:(NSString *)key;
 
+
+
+#pragma mark - 临时方法
+
+-(void)lsyNest_didScroll;
+
 @end
 
 NS_ASSUME_NONNULL_END
