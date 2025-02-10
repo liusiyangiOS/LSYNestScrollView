@@ -15,7 +15,6 @@
 @property (nonatomic, strong, readonly) NSMapTable *innerScrollViews;
 /** 当前联动的ScrollView */
 @property (nonatomic, weak) UIScrollView *activeScrollView;
-
 @end
 
 @implementation LSYScrollViewNestStructure
@@ -31,6 +30,8 @@
 @end
 
 @interface LSYScrollViewNestParam : NSObject
+
+@property (nonatomic, copy) NSString *key;
 
 @property (nonatomic, assign) BOOL isMainScrollView;
 
@@ -51,14 +52,12 @@
 @implementation UIScrollView (LSYNest)
 
 - (void)lsyNest_registerAsMainWithDelegate:(id<UIScrollViewDelegate>)delegate forKey:(NSString *)key{
-    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:key];
+    LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
     structure.mainScrollView = self;
     LSYScrollViewNestParam *param = [self lsyNest_param];
+    param.key = key;
     param.isMainScrollView = YES;
-    if (structure.innerScrollViews.count) {
-        //默认第一个注册的inner与main联动
-//        [structure.mainScrollView lsyNest_param].activeScrollView = self;
-    }
+    param.shouldScroll = YES;
 }
 
 - (void)lsyNest_registerAsInnerWithDelegate:(id<UIScrollViewDelegate>)delegate forKey:(NSString *)key{
@@ -66,29 +65,28 @@
 }
 
 - (void)lsyNest_registerAsInnerWithDelegate:(id<UIScrollViewDelegate>)delegate ofIndex:(NSInteger)index forKey:(NSString *)key{
-    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:key];
-    if (structure.mainScrollView && !structure.innerScrollViews.count) {
+    LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
+    if (!structure.innerScrollViews.count) {
         //默认第一个注册的inner与main联动
-        [structure.mainScrollView lsyNest_param].activeScrollView = self;
+        structure.activeScrollView = self;
     }
     if (index < 0) {
         index = structure.innerScrollViews.count;
     }
     [structure.innerScrollViews setObject:self forKey:@(index)];
     LSYScrollViewNestParam *param = [self lsyNest_param];
-    param.mainScrollView = structure.mainScrollView;
+    param.key = key;
     param.recognizeSimultaneouslyForPan = YES;
 }
 
 - (void)lsyNest_setActive{
-    UIScrollView *mainScrollView = [self lsyNest_param].mainScrollView;
-    [mainScrollView lsyNest_param].activeScrollView = self;
+    LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:[self lsyNest_param].key];
+    structure.activeScrollView = self;
 }
 
 + (void)lsyNest_setActiveIndex:(NSInteger)index forKey:(NSString *)key{
-    LSYScrollViewNestStructure *structure = [[self lsyNest_structureMap] objectForKey:key];
-    UIScrollView *scrollView = [structure.innerScrollViews objectForKey:@(index)];
-    [scrollView lsyNest_setActive];
+    LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
+    structure.activeScrollView = [structure.innerScrollViews objectForKey:@(index)];
 }
 
 + (void)lsyNest_removeStructureForKey:(NSString *)key{
@@ -99,8 +97,9 @@
 
 -(void)lsyNest_didScroll{
     LSYScrollViewNestParam *currentParam = [self lsyNest_param];
+    LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:currentParam.key];
     if (currentParam.isMainScrollView) {
-        LSYScrollViewNestParam *activeParam = [currentParam.activeScrollView lsyNest_param];
+        LSYScrollViewNestParam *activeParam = [structure.activeScrollView lsyNest_param];
         if (activeParam.shouldScroll) {
 //            scrollView.contentOffset = CGPointMake(0, targetOffsetY);
             self.contentOffset = CGPointMake(0, targetOffsetY);
@@ -128,6 +127,15 @@
         lsyNest_structureMap = [NSMutableDictionary dictionary];
     });
     return lsyNest_structureMap;
+}
+
++ (LSYScrollViewNestStructure *)lsyNest_structureForKey:(NSString *)key{
+    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:key];
+    if (!structure) {
+        structure = [LSYScrollViewNestStructure new];
+        [[UIScrollView lsyNest_structureMap] setObject:structure forKey:key];
+    }
+    return structure;
 }
 
 -(LSYScrollViewNestParam *)lsyNest_param{
