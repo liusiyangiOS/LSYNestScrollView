@@ -1,14 +1,14 @@
 //
-//  MainViewController.m
-//  LSYNestScrollView
+//  ComplexViewController.m
+//  LSYNestScrollViewDemo
 //
-//  Created by liusiyang on 2025/2/6.
+//  Created by liusiyang on 2025/2/10.
 //
 
-#import "NormalViewController.h"
+#import "ComplexViewController.h"
 #import <Masonry/Masonry.h>
 #import "BaseScrollView.h"
-#import "NormalContentView.h"
+#import "ComplexContentView.h"
 #import "UIScrollView+LSYNest.h"
 
 #define STATUSBAR_HEIGHT \
@@ -19,15 +19,13 @@ topHeight = window.safeAreaInsets.top;\
 }\
 (topHeight);})
 
-static NSString * const kNormalNestKey = @"NormalExample";
-
-@interface NormalViewController ()<UIScrollViewDelegate>{
+@interface ComplexViewController ()<UIScrollViewDelegate>{
     UIScrollView *_scrollView;
 }
 
 @end
 
-@implementation NormalViewController
+@implementation ComplexViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -36,7 +34,7 @@ static NSString * const kNormalNestKey = @"NormalExample";
     _scrollView = [[BaseScrollView alloc] initWithFrame:self.view.bounds];
     _scrollView.directionalLockEnabled = YES;
     //第一步,设置mainScrollView
-    [_scrollView lsyNest_registerAsMainWithDelegate:self forKey:kNormalNestKey];
+    [_scrollView lsyNest_registerAsMainWithDelegate:self forKey:@"Example"];
     //注册的时候传入代理了,所以就不需要再次设置了
 //    _scrollView.delegate = self;
     _scrollView.showsVerticalScrollIndicator = NO;
@@ -56,7 +54,7 @@ static NSString * const kNormalNestKey = @"NormalExample";
         make.height.equalTo(imageView.mas_width).multipliedBy(imageHeight);
     }];
     
-    NormalContentView *mainV = [[NormalContentView alloc] initWithIndex:-1 key:kNormalNestKey];
+    ComplexContentView *mainV = [[ComplexContentView alloc] init];
     [_scrollView addSubview:mainV];
     [mainV mas_makeConstraints:^(MASConstraintMaker *make) {
         make.leading.width.bottom.equalTo(_scrollView);

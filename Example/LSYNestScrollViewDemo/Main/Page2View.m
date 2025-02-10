@@ -15,47 +15,33 @@
 
 @implementation Page2View
 
-- (instancetype)initWithIndex:(NSInteger)index{
+- (instancetype)initWithIndex:(NSInteger)index key:(NSString *)key{
     self = [super init];
     if (self) {
-        //复杂使用方法示例
-        [self configUIWithIndex:index];
+        UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
+        flowLayout.minimumLineSpacing = 10;
+        flowLayout.sectionInset = UIEdgeInsetsMake(10, 10, 10, 10);
+        flowLayout.itemSize = CGSizeMake((UIScreen.mainScreen.bounds.size.width - 30) / 2, 200);
+        
+        UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:flowLayout];
+        [collectionView registerClass:UICollectionViewCell.class forCellWithReuseIdentifier:@"Cell"];
+        collectionView.dataSource = self;
+        //第二步,设置innerScrollView
+        if (index < 0) {
+            [collectionView lsyNest_registerAsInnerWithDelegate:self forKey:key];
+        }else{
+            //复杂使用方法示例
+            [collectionView lsyNest_registerAsInnerWithDelegate:self ofIndex:index forKey:key];
+        }
+        //注册的时候传入代理了,所以就不需要再次设置了
+    //    collectionView.delegate = self;
+        [self addSubview:collectionView];
+        [collectionView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.edges.equalTo(self);
+        }];
+        [collectionView reloadData];
     }
     return self;
-}
-
-- (instancetype)initWithFrame:(CGRect)frame
-{
-    self = [super initWithFrame:frame];
-    if (self) {
-        [self configUIWithIndex:-1];
-    }
-    return self;
-}
-
-- (void)configUIWithIndex:(NSInteger)index{
-    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    flowLayout.minimumLineSpacing = 10;
-    flowLayout.sectionInset = UIEdgeInsetsMake(10, 10, 10, 10);
-    flowLayout.itemSize = CGSizeMake((UIScreen.mainScreen.bounds.size.width - 30) / 2, 200);
-    
-    UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:flowLayout];
-    [collectionView registerClass:UICollectionViewCell.class forCellWithReuseIdentifier:@"Cell"];
-    collectionView.dataSource = self;
-    //第二步,设置innerScrollView
-    if (index < 0) {
-        [collectionView lsyNest_registerAsInnerWithDelegate:self forKey:@"Example"];
-    }else{
-        //复杂使用方法示例
-        [collectionView lsyNest_registerAsInnerWithDelegate:self ofIndex:index forKey:@"Example"];
-    }
-    //注册的时候传入代理了,所以就不需要再次设置了
-//    collectionView.delegate = self;
-    [self addSubview:collectionView];
-    [collectionView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(self);
-    }];
-    [collectionView reloadData];
 }
 
 #pragma mark - UICollectionViewDataSource

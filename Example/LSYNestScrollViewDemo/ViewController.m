@@ -7,6 +7,7 @@
 
 #import "ViewController.h"
 #import "NormalViewController.h"
+#import "ComplexViewController.h"
 #import <Masonry/Masonry.h>
 
 @interface ViewController ()
@@ -46,7 +47,7 @@
 }
 
 - (void)complexButtonClicked:(UIButton *)sender {
-    NormalViewController *mainVC = [[NormalViewController alloc] init];
+    ComplexViewController *mainVC = [[ComplexViewController alloc] init];
     [self.navigationController pushViewController:mainVC animated:YES];
 }
 

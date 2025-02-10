@@ -6,12 +6,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NestPageProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Page1View : UIView
-
-- (instancetype)initWithIndex:(NSInteger)index;
+@interface Page1View : UIView <NestPageProtocol>
 
 @end
 

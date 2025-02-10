@@ -15,45 +15,31 @@
 
 @implementation Page1View
 
-- (instancetype)initWithIndex:(NSInteger)index{
+- (instancetype)initWithIndex:(NSInteger)index key:(NSString *)key{
     self = [super init];
     if (self) {
-        //复杂使用方法示例
-        [self configUIWithIndex:index];
+        UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+        tableView.separatorInset = UIEdgeInsetsMake(0, 15, 0, 15);
+        tableView.separatorColor = [UIColor lightGrayColor];
+        tableView.dataSource = self;
+        //第二步,设置innerScrollView
+        if (index < 0) {
+            [tableView lsyNest_registerAsInnerWithDelegate:self forKey:key];
+        }else{
+            //复杂使用方法示例
+            [tableView lsyNest_registerAsInnerWithDelegate:self ofIndex:index forKey:key];
+        }
+        //注册的时候传入代理了,所以就不需要再次设置了
+    //    tableView.delegate = self;
+        tableView.rowHeight = 100;
+        tableView.tableFooterView = [[UIView alloc] init];
+        [self addSubview:tableView];
+        [tableView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.edges.equalTo(self);
+        }];
+        [tableView reloadData];
     }
     return self;
-}
-
-- (instancetype)initWithFrame:(CGRect)frame
-{
-    self = [super initWithFrame:frame];
-    if (self) {
-        [self configUIWithIndex:-1];
-    }
-    return self;
-}
-
-- (void)configUIWithIndex:(NSInteger)index{
-    UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
-    tableView.separatorInset = UIEdgeInsetsMake(0, 15, 0, 15);
-    tableView.separatorColor = [UIColor lightGrayColor];
-    tableView.dataSource = self;
-    //第二步,设置innerScrollView
-    if (index < 0) {
-        [tableView lsyNest_registerAsInnerWithDelegate:self forKey:@"Example"];
-    }else{
-        //复杂使用方法示例
-        [tableView lsyNest_registerAsInnerWithDelegate:self ofIndex:index forKey:@"Example"];
-    }
-    //注册的时候传入代理了,所以就不需要再次设置了
-//    tableView.delegate = self;
-    tableView.rowHeight = 100;
-    tableView.tableFooterView = [[UIView alloc] init];
-    [self addSubview:tableView];
-    [tableView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(self);
-    }];
-    [tableView reloadData];
 }
 
 #pragma mark - UITableViewDataSource
