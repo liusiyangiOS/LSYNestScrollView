@@ -41,11 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)lsyNest_registerAsInnerWithDelegate:(id<UIScrollViewDelegate>)delegate ofIndex:(NSInteger)index forKey:(NSString *)key;
 
-/** 将自己设置为active */
-- (void)lsyNest_setActive;
-
 /** 更新maxOffsetY(如果需要的话) */
 - (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY;
+
+/** 将自己设置为active */
+- (void)lsyNest_setActive;
 
 /** 更新maxOffsetY(如果需要的话) */
 + (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key;

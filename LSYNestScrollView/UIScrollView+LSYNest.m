@@ -85,13 +85,17 @@
     param.recognizeSimultaneouslyForPan = YES;
 }
 
+- (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY{
+    [UIScrollView lsyNest_updateMainScrollViewMaxOffsetY:maxOffsetY forKey:[self lsyNest_param].key];
+}
+
 - (void)lsyNest_setActive{
     LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:[self lsyNest_param].key];
     structure.activeScrollView = self;
-}
-
-- (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY{
-    [UIScrollView lsyNest_updateMainScrollViewMaxOffsetY:maxOffsetY forKey:[self lsyNest_param].key];
+    if (structure.mainScrollView.contentOffset.y < structure.maxOffsetY) {
+        self.contentOffset = CGPointZero;
+        [self lsyNest_param].shouldScroll = NO;
+    }
 }
 
 + (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key{
@@ -102,6 +106,10 @@
 + (void)lsyNest_setActiveIndex:(NSInteger)index forKey:(NSString *)key{
     LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
     structure.activeScrollView = [structure.innerScrollViews objectForKey:@(index)];
+    if (structure.mainScrollView.contentOffset.y < structure.maxOffsetY) {
+        structure.activeScrollView.contentOffset = CGPointZero;
+        [structure.activeScrollView lsyNest_param].shouldScroll = NO;
+    }
 }
 
 + (void)lsyNest_removeStructureForKey:(NSString *)key{
