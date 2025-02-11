@@ -21,9 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  将ScrollView注册为嵌套模式的主ScrollView(最外层的)
  @param delegate ScrollView的delegate
+ @param maxOffsetY mainScrollView可以滑动的最大的offsetY,也就是顶部banner位置的高度
  @param key 嵌套ScrollView体系的key,会将相同的key的ScrollView进行关联
  */
-- (void)lsyNest_registerAsMainWithDelegate:(id<UIScrollViewDelegate>)delegate forKey:(NSString *)key;
+- (void)lsyNest_registerAsMainWithDelegate:(id<UIScrollViewDelegate>)delegate maxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key;
 
 /**
  将ScrollView注册为嵌套模式的子ScrollView(内部的),根据添加顺序自动设置index
@@ -43,14 +44,16 @@ NS_ASSUME_NONNULL_BEGIN
 /** 将自己设置为active */
 - (void)lsyNest_setActive;
 
-/**
- 将index对应的ScrollView设置为active,即与main联动的状态(默认与第一个注册的联动)
- */
+/** 更新maxOffsetY(如果需要的话) */
+- (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY;
+
+/** 更新maxOffsetY(如果需要的话) */
++ (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key;
+
+/** 将index对应的ScrollView设置为active,即与main联动的状态(默认与第一个注册的联动) */
 + (void)lsyNest_setActiveIndex:(NSInteger)index forKey:(NSString *)key;
 
-/**
- 删除key对应的嵌套结构
- */
+/** 删除key对应的嵌套结构 */
 + (void)lsyNest_removeStructureForKey:(NSString *)key;
 
 

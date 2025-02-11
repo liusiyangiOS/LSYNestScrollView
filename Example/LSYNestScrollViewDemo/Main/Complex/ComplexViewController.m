@@ -33,8 +33,9 @@ topHeight = window.safeAreaInsets.top;\
     
     _scrollView = [[BaseScrollView alloc] initWithFrame:self.view.bounds];
     _scrollView.directionalLockEnabled = YES;
+    CGFloat imageHeight = UIScreen.mainScreen.bounds.size.width * 75 / 120;
     //第一步,设置mainScrollView
-    [_scrollView lsyNest_registerAsMainWithDelegate:self forKey:@"Example"];
+    [_scrollView lsyNest_registerAsMainWithDelegate:self maxOffsetY:imageHeight forKey:@"Example"];
     //注册的时候传入代理了,所以就不需要再次设置了
 //    _scrollView.delegate = self;
     _scrollView.showsVerticalScrollIndicator = NO;
@@ -48,10 +49,9 @@ topHeight = window.safeAreaInsets.top;\
     UIImage *bgImage = [UIImage imageNamed:@"MainHeaderBg"];
     UIImageView *imageView = [[UIImageView alloc] initWithImage:bgImage];
     [_scrollView addSubview:imageView];
-    CGFloat imageHeight = 75.0/120;
     [imageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.leading.width.equalTo(_scrollView);
-        make.height.equalTo(imageView.mas_width).multipliedBy(imageHeight);
+        make.height.equalTo(@(imageHeight));
     }];
     
     ComplexContentView *mainV = [[ComplexContentView alloc] init];
