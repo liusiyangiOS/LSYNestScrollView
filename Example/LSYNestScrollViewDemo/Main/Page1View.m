@@ -15,6 +15,11 @@
 
 @implementation Page1View
 
+- (void)dealloc
+{
+    NSLog(@"------Page1View dealloc");
+}
+
 - (instancetype)initWithIndex:(NSInteger)index key:(NSString *)key{
     self = [super init];
     if (self) {

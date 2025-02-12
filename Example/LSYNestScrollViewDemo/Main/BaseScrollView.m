@@ -10,6 +10,11 @@
 
 @implementation BaseScrollView
 
+- (void)dealloc
+{
+    NSLog(@"------BaseScrollView dealloc");
+}
+
 /**
  同时识别多个手势
 

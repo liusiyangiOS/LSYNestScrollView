@@ -19,13 +19,21 @@
 @property (nonatomic, weak) UIScrollView *activeScrollView;
 @end
 
-@implementation LSYScrollViewNestStructure
+@implementation LSYScrollViewNestStructure{
+    NSString *_key;
+}
 
-- (instancetype)init{
+- (void)dealloc
+{
+    NSLog(@"------LSYScrollViewNestStructure dealloc");
+    [UIScrollView lsyNest_removeStructureForKey:_key];
+}
+
+- (instancetype)initWithKey:(NSString *)key{
     self = [super init];
     if (self) {
+        _key = key;
         _innerScrollViews = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory];
-        //todo 动态监听释放移除
     }
     return self;
 }
@@ -35,6 +43,8 @@
 @interface LSYScrollViewNestParam : NSObject
 
 @property (nonatomic, copy) NSString *key;
+/** 每个相关ScrollView都强持有structure,全局字典弱持有 */
+@property (nonatomic, strong) LSYScrollViewNestStructure *structure;
 
 @property (nonatomic, assign) BOOL isMainScrollView;
 
@@ -63,6 +73,7 @@
     param.key = key;
     param.isMainScrollView = YES;
     param.shouldScroll = YES;
+    param.structure = structure;
 }
 
 - (void)lsyNest_registerAsInnerWithDelegate:(id<UIScrollViewDelegate>)delegate forKey:(NSString *)key{
@@ -83,6 +94,7 @@
     LSYScrollViewNestParam *param = [self lsyNest_param];
     param.key = key;
     param.recognizeSimultaneouslyForPan = YES;
+    param.structure = structure;
 }
 
 - (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY{
@@ -90,7 +102,10 @@
 }
 
 - (void)lsyNest_setActive{
-    LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:[self lsyNest_param].key];
+    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:[self lsyNest_param].key];
+    if (!structure) {
+        return;
+    }
     structure.activeScrollView = self;
     if (structure.mainScrollView.contentOffset.y < structure.maxOffsetY) {
         self.contentOffset = CGPointZero;
@@ -99,16 +114,25 @@
 }
 
 + (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key{
-    LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
-    structure.maxOffsetY = maxOffsetY;
+    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:key];
+    if (structure) {
+        structure.maxOffsetY = maxOffsetY;
+    }
 }
 
 + (void)lsyNest_setActiveIndex:(NSInteger)index forKey:(NSString *)key{
-    LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
-    structure.activeScrollView = [structure.innerScrollViews objectForKey:@(index)];
+    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:key];
+    if (!structure) {
+        return;
+    }
+    UIScrollView *scrollView = [structure.innerScrollViews objectForKey:@(index)];
+    if (!scrollView) {
+        return;
+    }
+    structure.activeScrollView = scrollView;
     if (structure.mainScrollView.contentOffset.y < structure.maxOffsetY) {
-        structure.activeScrollView.contentOffset = CGPointZero;
-        [structure.activeScrollView lsyNest_param].shouldScroll = NO;
+        scrollView.contentOffset = CGPointZero;
+        [scrollView lsyNest_param].shouldScroll = NO;
     }
 }
 
@@ -120,7 +144,10 @@
 
 -(void)lsyNest_didScroll{
     LSYScrollViewNestParam *currentParam = [self lsyNest_param];
-    LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:currentParam.key];
+    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:currentParam.key];
+    if (!structure) {
+        return;
+    }
     if (currentParam.isMainScrollView) {
         LSYScrollViewNestParam *activeParam = [structure.activeScrollView lsyNest_param];
         //todo 增加个状态,发送个通知
@@ -144,11 +171,11 @@
 
 #pragma mark - setter & getter
 
-+ (NSMutableDictionary *)lsyNest_structureMap{
-    static NSMutableDictionary *lsyNest_structureMap;
++ (NSMapTable *)lsyNest_structureMap{
+    static NSMapTable *lsyNest_structureMap;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        lsyNest_structureMap = [NSMutableDictionary dictionary];
+        lsyNest_structureMap = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory];
     });
     return lsyNest_structureMap;
 }
@@ -159,7 +186,7 @@
     }
     LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:key];
     if (!structure) {
-        structure = [LSYScrollViewNestStructure new];
+        structure = [[LSYScrollViewNestStructure alloc] initWithKey:key];
         [[UIScrollView lsyNest_structureMap] setObject:structure forKey:key];
     }
     return structure;
