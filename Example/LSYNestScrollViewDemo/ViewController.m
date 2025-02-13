@@ -6,8 +6,7 @@
 //
 
 #import "ViewController.h"
-#import "NormalViewController.h"
-#import "ComplexViewController.h"
+#import "NestViewController.h"
 #import <Masonry/Masonry.h>
 
 @interface ViewController ()
@@ -42,12 +41,12 @@
 }
 
 - (void)normalButtonClicked:(UIButton *)sender {
-    NormalViewController *mainVC = [[NormalViewController alloc] init];
+    NestViewController *mainVC = [[NestViewController alloc] init];
     [self.navigationController pushViewController:mainVC animated:YES];
 }
 
 - (void)complexButtonClicked:(UIButton *)sender {
-    ComplexViewController *mainVC = [[ComplexViewController alloc] init];
+    NestViewController *mainVC = [[NestViewController alloc] init];
     [self.navigationController pushViewController:mainVC animated:YES];
 }
 

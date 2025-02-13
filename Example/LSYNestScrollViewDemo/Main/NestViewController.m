@@ -1,13 +1,14 @@
 //
-//  ComplexViewController.m
-//  LSYNestScrollViewDemo
+//  MainViewController.m
+//  LSYNestScrollView
 //
-//  Created by liusiyang on 2025/2/10.
+//  Created by liusiyang on 2025/2/6.
 //
 
-#import "ComplexViewController.h"
+#import "NestViewController.h"
 #import <Masonry/Masonry.h>
 #import "BaseScrollView.h"
+#import "NormalContentView.h"
 #import "ComplexContentView.h"
 #import "UIScrollView+LSYNest.h"
 
@@ -19,13 +20,15 @@ topHeight = window.safeAreaInsets.top;\
 }\
 (topHeight);})
 
-@interface ComplexViewController ()<UIScrollViewDelegate>{
+static NSString * const kNormalNestKey = @"NormalExample";
+
+@interface NestViewController ()<UIScrollViewDelegate>{
     UIScrollView *_scrollView;
 }
 
 @end
 
-@implementation ComplexViewController
+@implementation NestViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -35,7 +38,7 @@ topHeight = window.safeAreaInsets.top;\
     _scrollView.directionalLockEnabled = YES;
     CGFloat imageHeight = UIScreen.mainScreen.bounds.size.width * 75 / 120;
     //第一步,设置mainScrollView
-    [_scrollView lsyNest_registerAsMainWithDelegate:self maxOffsetY:imageHeight forKey:@"Example"];
+    [_scrollView lsyNest_registerAsMainWithDelegate:self maxOffsetY:imageHeight forKey:kNormalNestKey];
     //注册的时候传入代理了,所以就不需要再次设置了
 //    _scrollView.delegate = self;
     _scrollView.showsVerticalScrollIndicator = NO;
@@ -54,7 +57,7 @@ topHeight = window.safeAreaInsets.top;\
         make.height.equalTo(@(imageHeight));
     }];
     
-    ComplexContentView *mainV = [[ComplexContentView alloc] init];
+    NormalContentView *mainV = [[NormalContentView alloc] initWithIndex:-1 key:kNormalNestKey];
     [_scrollView addSubview:mainV];
     [mainV mas_makeConstraints:^(MASConstraintMaker *make) {
         make.leading.width.bottom.equalTo(_scrollView);
@@ -66,19 +69,7 @@ topHeight = window.safeAreaInsets.top;\
 #pragma mark - UIScrollViewDelegate
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-//    CGFloat targetOffsetY = self.targetOffsetY;
-//    if (self.listView.shouldScroll){
-//        scrollView.contentOffset = CGPointMake(0, targetOffsetY);
-//        self.headerView.isStopSliding = YES;
-//    }else if (scrollView.contentOffset.y >= targetOffsetY) {
-//        scrollView.contentOffset = CGPointMake(0, targetOffsetY);
-//        self.headerView.isStopSliding = YES;
-//        if (self.listView.collectionView.dragging) {
-//            self.listView.shouldScroll = YES;
-//        }
-//    }else {
-//        self.headerView.isStopSliding = NO;
-//    }
+    [scrollView lsyNest_didScroll];
 }
 
 @end

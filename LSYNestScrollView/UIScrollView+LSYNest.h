@@ -33,8 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  滑动手势是否与其他的ScrollView的滑动手势同时识别
- 默认NO,innnerScrollView会在注册的时候设置为YES,这个属性没特殊需要不用管
- main和inner的这个属性[请不要改],改了会出问题
+ 默认NO,innnerScrollView会在注册的时候设置为YES,main和inner的这个属性[请不要改],改了会出问题
  其他ScrollView,使用者可根据自己的需要进行设置,如果设置成YES,则该ScrollView的滑动手势会与main和inner一起识别
  很少会有这样的需求,所以[一般用不上]
  */
@@ -61,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  移除key对应的嵌套结构
- 因为内部会在所有相关ScrollView全部释放后自动移除,使用者不需要关心移除问题,所以[一般用不上]
+ 因为内部会在所有相关ScrollView全部释放后[自动移除],使用者不需要关心移除问题,所以[一般用不上]
  如果使用者有特殊需求,需要在自动移除之前手动移除,则可以调用此方法
  */
 + (void)lsyNest_removeStructureForKey:(NSString *)key;

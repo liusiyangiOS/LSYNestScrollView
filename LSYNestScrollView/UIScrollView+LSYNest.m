@@ -25,7 +25,6 @@
 
 - (void)dealloc
 {
-    NSLog(@"------LSYScrollViewNestStructure dealloc");
     [UIScrollView lsyNest_removeStructureForKey:_key];
 }
 
@@ -97,29 +96,6 @@
     param.structure = structure;
 }
 
-- (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY{
-    [UIScrollView lsyNest_updateMainScrollViewMaxOffsetY:maxOffsetY forKey:[self lsyNest_param].key];
-}
-
-- (void)lsyNest_setActive{
-    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:[self lsyNest_param].key];
-    if (!structure) {
-        return;
-    }
-    structure.activeScrollView = self;
-    if (structure.mainScrollView.contentOffset.y < structure.maxOffsetY) {
-        self.contentOffset = CGPointZero;
-        [self lsyNest_param].shouldScroll = NO;
-    }
-}
-
-+ (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key{
-    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:key];
-    if (structure) {
-        structure.maxOffsetY = maxOffsetY;
-    }
-}
-
 + (void)lsyNest_setActiveIndex:(NSInteger)index forKey:(NSString *)key{
     LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:key];
     if (!structure) {
@@ -133,6 +109,31 @@
     if (structure.mainScrollView.contentOffset.y < structure.maxOffsetY) {
         scrollView.contentOffset = CGPointZero;
         [scrollView lsyNest_param].shouldScroll = NO;
+    }
+}
+
+#pragma mark - 一般用不上
+
+- (void)lsyNest_setActive{
+    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:[self lsyNest_param].key];
+    if (!structure) {
+        return;
+    }
+    structure.activeScrollView = self;
+    if (structure.mainScrollView.contentOffset.y < structure.maxOffsetY) {
+        self.contentOffset = CGPointZero;
+        [self lsyNest_param].shouldScroll = NO;
+    }
+}
+
+- (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY{
+    [UIScrollView lsyNest_updateMainScrollViewMaxOffsetY:maxOffsetY forKey:[self lsyNest_param].key];
+}
+
++ (void)lsyNest_updateMainScrollViewMaxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key{
+    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:key];
+    if (structure) {
+        structure.maxOffsetY = maxOffsetY;
     }
 }
 
