@@ -20,15 +20,30 @@ topHeight = window.safeAreaInsets.top;\
 }\
 (topHeight);})
 
-static NSString * const kNormalNestKey = @"NormalExample";
+/**
+ 正常来讲这个key应该尽量保证每个场景不一样
+ 如果情况复杂,可能同一个场景的不同实例也需要不同的key(比如同事存在同一种场景的两个不同实例,就得区分)
+ 同一个场景同事存在多个实例的情况,可以考虑将mainScrollView的实例地址作为key
+ 本例比较简单,就直接用相同的key了
+ */
+static NSString * const kNormalNestKey = @"Example";
 
 @interface NestViewController ()<UIScrollViewDelegate>{
     UIScrollView *_scrollView;
+    NestViewControllerType _type;
 }
 
 @end
 
 @implementation NestViewController
+
+- (instancetype)initWithType:(NestViewControllerType)type{
+    self = [super init];
+    if (self) {
+        _type = type;
+    }
+    return self;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -57,7 +72,12 @@ static NSString * const kNormalNestKey = @"NormalExample";
         make.height.equalTo(@(imageHeight));
     }];
     
-    NormalContentView *mainV = [[NormalContentView alloc] initWithIndex:-1 key:kNormalNestKey];
+    UIView *mainV = nil;
+    if (_type == NestViewControllerTypeComplex) {
+        mainV = [[ComplexContentView alloc] initWithKey:kNormalNestKey];
+    }else{
+        mainV = [[NormalContentView alloc] initWithIndex:-1 key:kNormalNestKey];
+    }
     [_scrollView addSubview:mainV];
     [mainV mas_makeConstraints:^(MASConstraintMaker *make) {
         make.leading.width.bottom.equalTo(_scrollView);

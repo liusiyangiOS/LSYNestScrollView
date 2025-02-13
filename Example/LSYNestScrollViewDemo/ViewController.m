@@ -46,7 +46,7 @@
 }
 
 - (void)complexButtonClicked:(UIButton *)sender {
-    NestViewController *mainVC = [[NestViewController alloc] init];
+    NestViewController *mainVC = [[NestViewController alloc] initWithType:NestViewControllerTypeComplex];
     [self.navigationController pushViewController:mainVC animated:YES];
 }
 

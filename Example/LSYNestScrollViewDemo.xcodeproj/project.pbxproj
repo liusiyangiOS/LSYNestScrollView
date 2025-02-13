@@ -206,10 +206,10 @@
 		8DA46FB42D5DCF91003EDAD6 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				8DA46FAC2D5DCF91003EDAD6 /* ComplexContentView.h */,
-				8DA46FAD2D5DCF91003EDAD6 /* ComplexContentView.m */,
 				8DA46FAE2D5DCF91003EDAD6 /* NormalContentView.h */,
 				8DA46FAF2D5DCF91003EDAD6 /* NormalContentView.m */,
+				8DA46FAC2D5DCF91003EDAD6 /* ComplexContentView.h */,
+				8DA46FAD2D5DCF91003EDAD6 /* ComplexContentView.m */,
 				8DA46FB02D5DCF91003EDAD6 /* Page1View.h */,
 				8DA46FB12D5DCF91003EDAD6 /* Page1View.m */,
 				8DA46FB22D5DCF91003EDAD6 /* Page2View.h */,

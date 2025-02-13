@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NormalContentView : UIView <NestPageProtocol>
 
+- (NSInteger)currentRealIndex;
+
 @end
 
 NS_ASSUME_NONNULL_END

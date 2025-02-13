@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ComplexContentView : UIView
 
+- (instancetype)initWithKey:(nonnull NSString *)key;
+
 @end
 
 NS_ASSUME_NONNULL_END

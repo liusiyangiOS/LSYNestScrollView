@@ -12,8 +12,6 @@
 #import "Page2View.h"
 #import "UIScrollView+LSYNest.h"
 
-#define kPageViewTagOrigin 'page'
-
 @interface NormalContentView ()<UIScrollViewDelegate>{
     CommonTabView *_tabView;
     NSInteger _index;
@@ -97,6 +95,14 @@
     }
     //随便怎么给都行,只要在原来的_index位置拓展子index就行
     return (_index + 1) * 10000 + index;
+}
+
+- (NSInteger)currentRealIndex{
+    if (_index < 0) {
+        return _tabView.index;
+    }
+    //随便怎么给都行,只要在原来的_index位置拓展子index就行
+    return (_index + 1) * 10000 + _tabView.index;
 }
 
 #pragma mark - UIScrollViewDelegate
