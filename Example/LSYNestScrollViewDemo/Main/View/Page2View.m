@@ -59,7 +59,7 @@
 #pragma mark UIScrollViewDelegate
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-    NSLog(@"------重写不受影响");
+//    NSLog(@"------Page2View did scroll");
     [scrollView lsyNest_didScroll];
 }
 

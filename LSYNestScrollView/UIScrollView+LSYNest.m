@@ -63,8 +63,15 @@
 
 @implementation UIScrollView (LSYNest)
 
+//+(void)load{
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        <#code to be executed once#>
+//    });
+//}
+
 - (void)lsyNest_registerAsMainWithDelegate:(id<UIScrollViewDelegate>)delegate maxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key{
-    self.delegate = delegate;
+    [self lsyNest_hockScrollViewDidScrollIfNeed:delegate];
     LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
     structure.mainScrollView = self;
     structure.maxOffsetY = maxOffsetY;
@@ -80,7 +87,7 @@
 }
 
 - (void)lsyNest_registerAsInnerWithDelegate:(id<UIScrollViewDelegate>)delegate ofIndex:(NSInteger)index forKey:(NSString *)key{
-    self.delegate = delegate;
+    [self lsyNest_hockScrollViewDidScrollIfNeed:delegate];
     LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
     if (!structure.innerScrollViews.count) {
         //默认第一个注册的inner与main联动
@@ -141,6 +148,67 @@
     [[self lsyNest_structureMap] removeObjectForKey:key];
 }
 
+#pragma mark - private method
+
+/** hock UIScrollView代理的ScrollViewDidScroll方法,增加需要的内容 */
+- (void)lsyNest_hockScrollViewDidScrollIfNeed:(id<UIScrollViewDelegate>)delegate{
+    self.delegate = delegate;
+    return;
+    Class delegateClass = delegate.class;
+    if ([[UIScrollView lsyNest_hockClassSet] containsObject:delegateClass]) {
+        //已经hock过了
+        return;
+    }
+    [[UIScrollView lsyNest_hockClassSet] addObject:delegateClass];
+    
+    SEL originalSelector = @selector(scrollViewDidScroll:);
+    SEL swizzledSelector = @selector(lsyNest_scrollViewDidScroll:);
+    
+    Method originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
+    Method swizzledMethod = class_getInstanceMethod(self.class, swizzledSelector);
+    
+    //先给delegate添加swizzl方法
+    BOOL noSwizzlMethod = class_addMethod(delegateClass, swizzledSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
+    if (!noSwizzlMethod) {
+        //已有swizzl方法,说明交换过了
+        return;
+    }
+    
+    BOOL noOriginMethod = class_addMethod(delegateClass, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
+    if (noOriginMethod){
+        //没有origin方法,直接添加swizzl方法
+        class_replaceMethod(delegateClass, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
+    }else{
+        method_exchangeImplementations(originalMethod, swizzledMethod);
+    }
+}
+
+-(void)lsyNest_scrollViewDidScroll:(UIScrollView *)scrollView{
+    [self lsyNest_scrollViewDidScroll:scrollView];
+    LSYScrollViewNestParam *currentParam = [scrollView lsyNest_param];
+    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:currentParam.key];
+    if (!structure) {
+        return;
+    }
+    if (currentParam.isMainScrollView) {
+        LSYScrollViewNestParam *activeParam = [structure.activeScrollView lsyNest_param];
+        //todo 增加个状态,发送个通知
+        if (activeParam.shouldScroll) {
+            scrollView.contentOffset = CGPointMake(0, structure.maxOffsetY);
+        }else if (scrollView.contentOffset.y >= structure.maxOffsetY) {
+            scrollView.contentOffset = CGPointMake(0, structure.maxOffsetY);
+            activeParam.shouldScroll = YES;
+        }
+        return;
+    }
+    if (!currentParam.shouldScroll) {
+        scrollView.contentOffset = CGPointZero;
+    }else if (scrollView.contentOffset.y <= 0) {
+        scrollView.contentOffset = CGPointZero;
+        currentParam.shouldScroll = NO;
+    }
+}
+
 #pragma mark - 临时方法
 
 -(void)lsyNest_didScroll{
@@ -179,6 +247,15 @@
         lsyNest_structureMap = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory];
     });
     return lsyNest_structureMap;
+}
+
++ (NSMutableSet *)lsyNest_hockClassSet{
+    static NSMutableSet *lsyNest_hockClassSet;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        lsyNest_hockClassSet = [NSMutableSet set];
+    });
+    return lsyNest_hockClassSet;
 }
 
 + (LSYScrollViewNestStructure *)lsyNest_structureForKey:(NSString *)key{

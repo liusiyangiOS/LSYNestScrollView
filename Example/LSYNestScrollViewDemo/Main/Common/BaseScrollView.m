@@ -10,13 +10,6 @@
 
 @implementation BaseScrollView
 
-/**
- 同时识别多个手势
-
- @param gestureRecognizer gestureRecognizer description
- @param otherGestureRecognizer otherGestureRecognizer description
- @return return value description
- */
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
 {
     //只有mainScrollView才响应此方法
