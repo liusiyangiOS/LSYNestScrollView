@@ -153,7 +153,6 @@
 /** hock UIScrollView代理的ScrollViewDidScroll方法,增加需要的内容 */
 - (void)lsyNest_hockScrollViewDidScrollIfNeed:(id<UIScrollViewDelegate>)delegate{
     self.delegate = delegate;
-    return;
     Class delegateClass = delegate.class;
     if ([[UIScrollView lsyNest_hockClassSet] containsObject:delegateClass]) {
         //已经hock过了
@@ -161,18 +160,18 @@
     }
     [[UIScrollView lsyNest_hockClassSet] addObject:delegateClass];
     
-    SEL originalSelector = @selector(scrollViewDidScroll:);
     SEL swizzledSelector = @selector(lsyNest_scrollViewDidScroll:);
-    
-    Method originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
-    Method swizzledMethod = class_getInstanceMethod(self.class, swizzledSelector);
-    
-    //先给delegate添加swizzl方法
-    BOOL noSwizzlMethod = class_addMethod(delegateClass, swizzledSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
-    if (!noSwizzlMethod) {
-        //已有swizzl方法,说明交换过了
+    if (class_getInstanceMethod(delegateClass, swizzledSelector)) {
+        //已有该方法,说明已经swizzl过了
         return;
     }
+    //给delegate添加swizzl方法
+    Method addedMethod = class_getInstanceMethod(self.class, swizzledSelector);
+    class_addMethod(delegateClass, swizzledSelector, method_getImplementation(addedMethod), method_getTypeEncoding(addedMethod));
+    
+    SEL originalSelector = @selector(scrollViewDidScroll:);
+    Method originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
+    Method swizzledMethod = class_getInstanceMethod(delegateClass, swizzledSelector);
     
     BOOL noOriginMethod = class_addMethod(delegateClass, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
     if (noOriginMethod){
@@ -205,35 +204,6 @@
         scrollView.contentOffset = CGPointZero;
     }else if (scrollView.contentOffset.y <= 0) {
         scrollView.contentOffset = CGPointZero;
-        currentParam.shouldScroll = NO;
-    }
-}
-
-#pragma mark - 临时方法
-
--(void)lsyNest_didScroll{
-    LSYScrollViewNestParam *currentParam = [self lsyNest_param];
-    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:currentParam.key];
-    if (!structure) {
-        return;
-    }
-    if (currentParam.isMainScrollView) {
-        LSYScrollViewNestParam *activeParam = [structure.activeScrollView lsyNest_param];
-        //todo 增加个状态,发送个通知
-        if (activeParam.shouldScroll) {
-//            scrollView.contentOffset = CGPointMake(0, structure.maxOffsetY);
-            self.contentOffset = CGPointMake(0, structure.maxOffsetY);
-        }else if (self.contentOffset.y >= structure.maxOffsetY) {
-            self.contentOffset = CGPointMake(0, structure.maxOffsetY);
-            activeParam.shouldScroll = YES;
-        }
-        return;
-    }
-    if (!currentParam.shouldScroll) {
-//        scrollView.contentOffset = CGPointZero;
-        self.contentOffset = CGPointZero;
-    }else if (self.contentOffset.y <= 0) {
-        self.contentOffset = CGPointZero;
         currentParam.shouldScroll = NO;
     }
 }
@@ -285,6 +255,35 @@
 
 -(BOOL)lsyNest_recognizeSimultaneouslyForPan{
     return [self lsyNest_param].recognizeSimultaneouslyForPan;
+}
+
+#pragma mark - 临时方法
+
+-(void)lsyNest_didScroll{
+    LSYScrollViewNestParam *currentParam = [self lsyNest_param];
+    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:currentParam.key];
+    if (!structure) {
+        return;
+    }
+    if (currentParam.isMainScrollView) {
+        LSYScrollViewNestParam *activeParam = [structure.activeScrollView lsyNest_param];
+        //todo 增加个状态,发送个通知
+        if (activeParam.shouldScroll) {
+//            scrollView.contentOffset = CGPointMake(0, structure.maxOffsetY);
+            self.contentOffset = CGPointMake(0, structure.maxOffsetY);
+        }else if (self.contentOffset.y >= structure.maxOffsetY) {
+            self.contentOffset = CGPointMake(0, structure.maxOffsetY);
+            activeParam.shouldScroll = YES;
+        }
+        return;
+    }
+    if (!currentParam.shouldScroll) {
+//        scrollView.contentOffset = CGPointZero;
+        self.contentOffset = CGPointZero;
+    }else if (self.contentOffset.y <= 0) {
+        self.contentOffset = CGPointZero;
+        currentParam.shouldScroll = NO;
+    }
 }
 
 @end

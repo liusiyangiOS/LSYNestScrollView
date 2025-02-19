@@ -59,8 +59,7 @@
 #pragma mark UIScrollViewDelegate
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-//    NSLog(@"------Page2View did scroll");
-    [scrollView lsyNest_didScroll];
+    NSLog(@"------Page2View did scroll");
 }
 
 @end
