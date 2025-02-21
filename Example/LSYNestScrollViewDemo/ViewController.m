@@ -7,6 +7,7 @@
 
 #import "ViewController.h"
 #import "NestViewController.h"
+#import "SubNestViewController1.h"
 #import <Masonry/Masonry.h>
 
 @interface ViewController ()
@@ -41,7 +42,8 @@
 }
 
 - (void)normalButtonClicked:(UIButton *)sender {
-    NestViewController *mainVC = [[NestViewController alloc] init];
+//    NestViewController *mainVC = [[NestViewController alloc] init];
+    NestViewController *mainVC = [[SubNestViewController1 alloc] init];
     [self.navigationController pushViewController:mainVC animated:YES];
 }
 

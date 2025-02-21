@@ -159,31 +159,48 @@
         return;
     }
     [[UIScrollView lsyNest_hockClassSet] addObject:delegateClass];
-    
+
+    //先给delegate添加swizzl方法,因为delegate里边没有swizzl方法
     SEL swizzledSelector = @selector(lsyNest_scrollViewDidScroll:);
-    if (class_getInstanceMethod(delegateClass, swizzledSelector)) {
-        //已有该方法,说明已经swizzl过了
-        return;
-    }
-    //给delegate添加swizzl方法
-    Method addedMethod = class_getInstanceMethod(self.class, swizzledSelector);
-    class_addMethod(delegateClass, swizzledSelector, method_getImplementation(addedMethod), method_getTypeEncoding(addedMethod));
+    Method swizzledMethod = class_getInstanceMethod(self.class, swizzledSelector);
+    class_addMethod(delegateClass, swizzledSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
+    
+    //然后需要重新获取delegateClass的swizzl方法(之前获取的是self的)
+    swizzledMethod = class_getInstanceMethod(delegateClass, swizzledSelector);
     
     SEL originalSelector = @selector(scrollViewDidScroll:);
     Method originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
-    Method swizzledMethod = class_getInstanceMethod(delegateClass, swizzledSelector);
+    if (!originalMethod) {
+        //没有originMethod,添加空实现
+        SEL emptySelector = @selector(lsyNest_emptyScrollViewDidScroll:);
+        Method emptyMethod = class_getInstanceMethod(self.class, emptySelector);
+        BOOL success = class_addMethod(delegateClass, originalSelector, method_getImplementation(emptyMethod), method_getTypeEncoding(emptyMethod));
+        //重新获取originalMethod
+        originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
+        //交换实现
+        method_exchangeImplementations(originalMethod, swizzledMethod);
+        
+        if ([delegate respondsToSelector:originalSelector]) {
+            NSLog(@"YES");
+        }
+        return;
+    }
     
-    BOOL noOriginMethod = class_addMethod(delegateClass, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
-    if (noOriginMethod){
-        //没有origin方法,直接添加swizzl方法
+    //这里为什么要先尝试添加方法?因为如果需要swizzl的方法在父类,那么是不可以直接swizzl的,会有问题
+    BOOL success = class_addMethod(delegateClass, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
+    if (success){
+        //如果添加成功了,说明没有实现originalMethod或者在父类,当前类没有覆写,那么直接添加swizzl方法即可
         class_replaceMethod(delegateClass, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
     }else{
         method_exchangeImplementations(originalMethod, swizzledMethod);
     }
 }
 
+-(void)lsyNest_emptyScrollViewDidScroll:(UIScrollView *)scrollView{
+    NSLog(@"默认实现");
+}
+
 -(void)lsyNest_scrollViewDidScroll:(UIScrollView *)scrollView{
-    [self lsyNest_scrollViewDidScroll:scrollView];
     LSYScrollViewNestParam *currentParam = [scrollView lsyNest_param];
     LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:currentParam.key];
     if (!structure) {
@@ -198,14 +215,16 @@
             scrollView.contentOffset = CGPointMake(0, structure.maxOffsetY);
             activeParam.shouldScroll = YES;
         }
-        return;
+    }else{
+        if (!currentParam.shouldScroll) {
+            scrollView.contentOffset = CGPointZero;
+        }else if (scrollView.contentOffset.y <= 0) {
+            scrollView.contentOffset = CGPointZero;
+            currentParam.shouldScroll = NO;
+        }
     }
-    if (!currentParam.shouldScroll) {
-        scrollView.contentOffset = CGPointZero;
-    }else if (scrollView.contentOffset.y <= 0) {
-        scrollView.contentOffset = CGPointZero;
-        currentParam.shouldScroll = NO;
-    }
+    //因为会修改contentOffset,所以最后调用原方法
+    [self lsyNest_scrollViewDidScroll:scrollView];
 }
 
 #pragma mark - setter & getter
@@ -255,35 +274,6 @@
 
 -(BOOL)lsyNest_recognizeSimultaneouslyForPan{
     return [self lsyNest_param].recognizeSimultaneouslyForPan;
-}
-
-#pragma mark - 临时方法
-
--(void)lsyNest_didScroll{
-    LSYScrollViewNestParam *currentParam = [self lsyNest_param];
-    LSYScrollViewNestStructure *structure = [[UIScrollView lsyNest_structureMap] objectForKey:currentParam.key];
-    if (!structure) {
-        return;
-    }
-    if (currentParam.isMainScrollView) {
-        LSYScrollViewNestParam *activeParam = [structure.activeScrollView lsyNest_param];
-        //todo 增加个状态,发送个通知
-        if (activeParam.shouldScroll) {
-//            scrollView.contentOffset = CGPointMake(0, structure.maxOffsetY);
-            self.contentOffset = CGPointMake(0, structure.maxOffsetY);
-        }else if (self.contentOffset.y >= structure.maxOffsetY) {
-            self.contentOffset = CGPointMake(0, structure.maxOffsetY);
-            activeParam.shouldScroll = YES;
-        }
-        return;
-    }
-    if (!currentParam.shouldScroll) {
-//        scrollView.contentOffset = CGPointZero;
-        self.contentOffset = CGPointZero;
-    }else if (self.contentOffset.y <= 0) {
-        self.contentOffset = CGPointZero;
-        currentParam.shouldScroll = NO;
-    }
 }
 
 @end
