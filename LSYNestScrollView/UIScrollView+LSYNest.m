@@ -71,7 +71,9 @@
 //}
 
 - (void)lsyNest_registerAsMainWithDelegate:(id<UIScrollViewDelegate>)delegate maxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key{
-    [self lsyNest_hockScrollViewDidScrollIfNeed:delegate];
+    [self lsyNest_hookScrollViewDidScrollIfNeed:delegate];
+    //先设置代理再hook,如果代理没实现代理方法,增加的代理方法当次不生效,这你敢信???
+    self.delegate = delegate;
     LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
     structure.mainScrollView = self;
     structure.maxOffsetY = maxOffsetY;
@@ -87,7 +89,9 @@
 }
 
 - (void)lsyNest_registerAsInnerWithDelegate:(id<UIScrollViewDelegate>)delegate ofIndex:(NSInteger)index forKey:(NSString *)key{
-    [self lsyNest_hockScrollViewDidScrollIfNeed:delegate];
+    [self lsyNest_hookScrollViewDidScrollIfNeed:delegate];
+    //先设置代理再hook,如果代理没实现代理方法,增加的代理方法当次不生效,这你敢信???
+    self.delegate = delegate;
     LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
     if (!structure.innerScrollViews.count) {
         //默认第一个注册的inner与main联动
@@ -150,15 +154,14 @@
 
 #pragma mark - private method
 
-/** hock UIScrollView代理的ScrollViewDidScroll方法,增加需要的内容 */
-- (void)lsyNest_hockScrollViewDidScrollIfNeed:(id<UIScrollViewDelegate>)delegate{
-    self.delegate = delegate;
+/** hook UIScrollView代理的ScrollViewDidScroll方法,增加需要的内容 */
+- (void)lsyNest_hookScrollViewDidScrollIfNeed:(id<UIScrollViewDelegate>)delegate{
     Class delegateClass = delegate.class;
-    if ([[UIScrollView lsyNest_hockClassSet] containsObject:delegateClass]) {
-        //已经hock过了
+    if ([[UIScrollView lsyNest_hookClassSet] containsObject:delegateClass]) {
+        //已经hook过了
         return;
     }
-    [[UIScrollView lsyNest_hockClassSet] addObject:delegateClass];
+    [[UIScrollView lsyNest_hookClassSet] addObject:delegateClass];
 
     //先给delegate添加swizzl方法,因为delegate里边没有swizzl方法
     SEL swizzledSelector = @selector(lsyNest_scrollViewDidScroll:);
@@ -172,17 +175,11 @@
     Method originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
     if (!originalMethod) {
         //没有originMethod,添加空实现
-        SEL emptySelector = @selector(lsyNest_emptyScrollViewDidScroll:);
-        Method emptyMethod = class_getInstanceMethod(self.class, emptySelector);
-        BOOL success = class_addMethod(delegateClass, originalSelector, method_getImplementation(emptyMethod), method_getTypeEncoding(emptyMethod));
+        class_addMethod(delegateClass, originalSelector, (IMP)lsyNest_emptyScrollViewDidScroll, "v@:@");
         //重新获取originalMethod
         originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
         //交换实现
         method_exchangeImplementations(originalMethod, swizzledMethod);
-        
-        if ([delegate respondsToSelector:originalSelector]) {
-            NSLog(@"YES");
-        }
         return;
     }
     
@@ -196,7 +193,7 @@
     }
 }
 
--(void)lsyNest_emptyScrollViewDidScroll:(UIScrollView *)scrollView{
+void lsyNest_emptyScrollViewDidScroll(id self, SEL _cmd, UIScrollView *scrollView) {
     NSLog(@"默认实现");
 }
 
@@ -238,13 +235,13 @@
     return lsyNest_structureMap;
 }
 
-+ (NSMutableSet *)lsyNest_hockClassSet{
-    static NSMutableSet *lsyNest_hockClassSet;
++ (NSMutableSet *)lsyNest_hookClassSet{
+    static NSMutableSet *lsyNest_hookClassSet;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        lsyNest_hockClassSet = [NSMutableSet set];
+        lsyNest_hookClassSet = [NSMutableSet set];
     });
-    return lsyNest_hockClassSet;
+    return lsyNest_hookClassSet;
 }
 
 + (LSYScrollViewNestStructure *)lsyNest_structureForKey:(NSString *)key{
