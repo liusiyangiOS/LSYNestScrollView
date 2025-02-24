@@ -73,6 +73,9 @@
 - (void)lsyNest_registerAsMainWithDelegate:(id<UIScrollViewDelegate>)delegate maxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key{
     [self lsyNest_hookScrollViewDidScrollIfNeed:delegate];
     //先设置代理再hook,如果代理没实现代理方法,增加的代理方法当次不生效,这你敢信???
+    //好吧,猜测是因为scrollViewDidScroll:这样的方法调用次数太多了,每次都判断delegate是否实现了该方法比较耗时,所以在设置delegate的时候,直接判断了是否实现了对应的方法,然后将结果存在了本地,不是每次都判断的
+    //为了防止外边已经先设置过代理了,导致当次添加方法不生效,先置空才重新添加
+    self.delegate = nil;
     self.delegate = delegate;
     LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
     structure.mainScrollView = self;
@@ -90,7 +93,8 @@
 
 - (void)lsyNest_registerAsInnerWithDelegate:(id<UIScrollViewDelegate>)delegate ofIndex:(NSInteger)index forKey:(NSString *)key{
     [self lsyNest_hookScrollViewDidScrollIfNeed:delegate];
-    //先设置代理再hook,如果代理没实现代理方法,增加的代理方法当次不生效,这你敢信???
+    //同上,这里必须要这么写
+    self.delegate = nil;
     self.delegate = delegate;
     LSYScrollViewNestStructure *structure = [UIScrollView lsyNest_structureForKey:key];
     if (!structure.innerScrollViews.count) {
@@ -175,7 +179,10 @@
     Method originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
     if (!originalMethod) {
         //没有originMethod,添加空实现
-        class_addMethod(delegateClass, originalSelector, (IMP)lsyNest_emptyScrollViewDidScroll, "v@:@");
+        void (^ block)(UIScrollView *scrollView) = ^(UIScrollView *scrollView){
+            NSLog(@"---默认实现");
+        };
+        class_addMethod(delegateClass, originalSelector, imp_implementationWithBlock(block), "v@:@");
         //重新获取originalMethod
         originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
         //交换实现
@@ -191,10 +198,6 @@
     }else{
         method_exchangeImplementations(originalMethod, swizzledMethod);
     }
-}
-
-void lsyNest_emptyScrollViewDidScroll(id self, SEL _cmd, UIScrollView *scrollView) {
-    NSLog(@"默认实现");
 }
 
 -(void)lsyNest_scrollViewDidScroll:(UIScrollView *)scrollView{

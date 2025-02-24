@@ -56,10 +56,4 @@
     return cell;
 }
 
-#pragma mark UIScrollViewDelegate
-
-//-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-//    NSLog(@"------Page2View did scroll");
-//}
-
 @end

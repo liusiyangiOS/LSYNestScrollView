@@ -86,10 +86,4 @@ static NSString * const kNormalNestKey = @"Example";
     }];
 }
 
-#pragma mark - UIScrollViewDelegate
-
-//-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-//    NSLog(@"------NestViewController did scroll");
-//}
-
 @end

@@ -14,8 +14,6 @@
 		8D28C47A2D54D48500BAF2E7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D28C4652D54D48500BAF2E7 /* AppDelegate.m */; };
 		8D28C47B2D54D48500BAF2E7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D28C46A2D54D48500BAF2E7 /* main.m */; };
 		8D28C47F2D54D48500BAF2E7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D28C4742D54D48500BAF2E7 /* ViewController.m */; };
-		8D52D7FD2D670523000B1FD6 /* SubNestViewController1.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D52D7FC2D670523000B1FD6 /* SubNestViewController1.m */; };
-		8D52D8032D675A29000B1FD6 /* SubNestViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D52D8022D675A29000B1FD6 /* SubNestViewController2.m */; };
 		8DA46FB52D5DCF91003EDAD6 /* CommonTabView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DA46FA72D5DCF91003EDAD6 /* CommonTabView.m */; };
 		8DA46FB62D5DCF91003EDAD6 /* ComplexContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DA46FAD2D5DCF91003EDAD6 /* ComplexContentView.m */; };
 		8DA46FB72D5DCF91003EDAD6 /* NormalContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DA46FAF2D5DCF91003EDAD6 /* NormalContentView.m */; };
@@ -57,10 +55,6 @@
 		8D28C46A2D54D48500BAF2E7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		8D28C4732D54D48500BAF2E7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		8D28C4742D54D48500BAF2E7 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		8D52D7FB2D670523000B1FD6 /* SubNestViewController1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubNestViewController1.h; sourceTree = "<group>"; };
-		8D52D7FC2D670523000B1FD6 /* SubNestViewController1.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubNestViewController1.m; sourceTree = "<group>"; };
-		8D52D8012D675A29000B1FD6 /* SubNestViewController2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubNestViewController2.h; sourceTree = "<group>"; };
-		8D52D8022D675A29000B1FD6 /* SubNestViewController2.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubNestViewController2.m; sourceTree = "<group>"; };
 		8DA46FA42D5DCF91003EDAD6 /* BaseScrollView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BaseScrollView.h; sourceTree = "<group>"; };
 		8DA46FA52D5DCF91003EDAD6 /* BaseScrollView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BaseScrollView.m; sourceTree = "<group>"; };
 		8DA46FA62D5DCF91003EDAD6 /* CommonTabView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonTabView.h; sourceTree = "<group>"; };
@@ -191,10 +185,6 @@
 			children = (
 				8DA46FAA2D5DCF91003EDAD6 /* NestViewController.h */,
 				8DA46FAB2D5DCF91003EDAD6 /* NestViewController.m */,
-				8D52D7FB2D670523000B1FD6 /* SubNestViewController1.h */,
-				8D52D7FC2D670523000B1FD6 /* SubNestViewController1.m */,
-				8D52D8012D675A29000B1FD6 /* SubNestViewController2.h */,
-				8D52D8022D675A29000B1FD6 /* SubNestViewController2.m */,
 				8DA46FA92D5DCF91003EDAD6 /* Common */,
 				8DA46FB42D5DCF91003EDAD6 /* View */,
 			);
@@ -410,9 +400,7 @@
 				8DA46FBA2D5DCF91003EDAD6 /* Page2View.m in Sources */,
 				8DA46FBB2D5DCF91003EDAD6 /* BaseScrollView.m in Sources */,
 				8D28C47B2D54D48500BAF2E7 /* main.m in Sources */,
-				8D52D7FD2D670523000B1FD6 /* SubNestViewController1.m in Sources */,
 				8D28C47F2D54D48500BAF2E7 /* ViewController.m in Sources */,
-				8D52D8032D675A29000B1FD6 /* SubNestViewController2.m in Sources */,
 				8D07E60B2D56F966009B9553 /* UIScrollView+LSYNest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
