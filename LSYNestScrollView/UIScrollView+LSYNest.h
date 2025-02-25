@@ -12,6 +12,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UIScrollView (LSYNest)
 
 /**
+ 若未触发嵌套滑动相关的逻辑,如果要对shouldRecognizeSimultaneously这一块的逻辑进行修改,添加一些自己的逻辑(如侧滑返回手势是否要同时识别),则可以在这里进行实现
+ */
+@property (nonatomic, copy) BOOL (^ lsyNest_shouldRecognizeSimultaneously)(UIGestureRecognizer *gestureRecognizer, UIGestureRecognizer *otherGestureRecognizer);
+
+/**
  将ScrollView注册为嵌套模式的主ScrollView(最外层的)
  @param delegate ScrollView的delegate
  @param maxOffsetY mainScrollView可以滑动的最大的offsetY,也就是顶部banner位置的高度

@@ -55,6 +55,8 @@
  除innnerScrollView之外的,使用者可根据自己的需要进行设置
  */
 @property (nonatomic, assign) BOOL recognizeSimultaneouslyForPan;
+
+@property (nonatomic, copy) BOOL (^ shouldRecognizeSimultaneously)(UIGestureRecognizer *gestureRecognizer, UIGestureRecognizer *otherGestureRecognizer);
 @end
 
 @implementation LSYScrollViewNestParam
@@ -63,14 +65,11 @@
 
 @implementation UIScrollView (LSYNest)
 
-//+(void)load{
-//    static dispatch_once_t onceToken;
-//    dispatch_once(&onceToken, ^{
-//        <#code to be executed once#>
-//    });
-//}
-
 - (void)lsyNest_registerAsMainWithDelegate:(id<UIScrollViewDelegate>)delegate maxOffsetY:(CGFloat)maxOffsetY forKey:(NSString *)key{
+    //放到这里而不是+load里的原因是,希望尽可能晚的hook,避免有其他类也需要hook这个方法从而影响逻辑
+    //直接用UIScrollView调用,避免当前类是ScrollView的子类的情况
+    [UIScrollView lsyNest_hookGestureRecognizerDelegateIfNeed];
+    //因为需要hook的是代理的方法,只有设置的时候才知道具体是哪个类,所以只能提前hook
     [self lsyNest_hookScrollViewDidScrollIfNeed:delegate];
     //先设置代理再hook,如果代理没实现代理方法,增加的代理方法当次不生效,这你敢信???
     //好吧,猜测是因为scrollViewDidScroll:这样的方法调用次数太多了,每次都判断delegate是否实现了该方法比较耗时,所以在设置delegate的时候,直接判断了是否实现了对应的方法,然后将结果存在了本地,不是每次都判断的
@@ -158,6 +157,53 @@
 
 #pragma mark - private method
 
++ (void)lsyNest_hookGestureRecognizerDelegateIfNeed{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        SEL originalSelector = @selector(gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:);
+        Method originalMethod = class_getInstanceMethod(self, originalSelector);
+        SEL swizzledSelector = @selector(lsyNest_gestureRecognizer:shouldRecognizeSimultaneouslyWithGestureRecognizer:);
+        Method swizzledMethod = class_getInstanceMethod(self, swizzledSelector);
+
+        BOOL success = class_addMethod(self, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
+        if (success){
+            if (originalMethod) {
+                class_replaceMethod(self, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
+            }else{
+                //没有originMethod,直接把swizzl方法重置为空方法
+                BOOL (^ block)(UIGestureRecognizer *ges, UIGestureRecognizer *otherGes) = ^(UIGestureRecognizer *ges, UIGestureRecognizer *otherGes){
+                    return NO;
+                };
+                class_replaceMethod(self, swizzledSelector, imp_implementationWithBlock(block), "v@:@@");
+            }
+        }else{
+            method_exchangeImplementations(originalMethod, swizzledMethod);
+        }
+    });
+}
+
+- (BOOL)lsyNest_gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    if ([self lsyNest_gestureRecognizer:gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:otherGestureRecognizer]) {
+        //因为这个代理方法默认是没实现的(相当于返回NO),如果返回YES,说明其他地方也hook并添加了实现逻辑,也保不齐未来苹果也添加实现了,所以要考虑这些
+        return YES;
+    }
+    if (![self lsyNest_param].isMainScrollView) {
+        //只有mainScrollView才响应此方法
+        return self.lsyNest_recognizeSimultaneouslyForPan;
+    }
+    if ([otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]
+        && [otherGestureRecognizer.view isKindOfClass:[UIScrollView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)otherGestureRecognizer.view;
+        return scrollView.lsyNest_recognizeSimultaneouslyForPan;
+    }
+    //给外部开放添加逻辑的能力
+    if ([self lsyNest_param].shouldRecognizeSimultaneously) {
+        return [self lsyNest_param].shouldRecognizeSimultaneously(gestureRecognizer,otherGestureRecognizer);
+    }
+    return NO;
+}
+
 /** hook UIScrollView代理的ScrollViewDidScroll方法,增加需要的内容 */
 - (void)lsyNest_hookScrollViewDidScrollIfNeed:(id<UIScrollViewDelegate>)delegate{
     Class delegateClass = delegate.class;
@@ -179,9 +225,7 @@
     Method originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
     if (!originalMethod) {
         //没有originMethod,添加空实现
-        void (^ block)(UIScrollView *scrollView) = ^(UIScrollView *scrollView){
-            NSLog(@"---默认实现");
-        };
+        void (^ block)(UIScrollView *scrollView) = ^(UIScrollView *scrollView){};
         class_addMethod(delegateClass, originalSelector, imp_implementationWithBlock(block), "v@:@");
         //重新获取originalMethod
         originalMethod = class_getInstanceMethod(delegateClass, originalSelector);
@@ -274,6 +318,14 @@
 
 -(BOOL)lsyNest_recognizeSimultaneouslyForPan{
     return [self lsyNest_param].recognizeSimultaneouslyForPan;
+}
+
+-(void)setLsyNest_shouldRecognizeSimultaneously:(BOOL (^)(UIGestureRecognizer * _Nonnull, UIGestureRecognizer * _Nonnull))lsyNest_shouldRecognizeSimultaneously{
+    [self lsyNest_param].shouldRecognizeSimultaneously = lsyNest_shouldRecognizeSimultaneously;
+}
+
+-(BOOL (^)(UIGestureRecognizer * _Nonnull, UIGestureRecognizer * _Nonnull))lsyNest_shouldRecognizeSimultaneously{
+    return [self lsyNest_param].shouldRecognizeSimultaneously;
 }
 
 @end
